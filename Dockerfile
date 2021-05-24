@@ -11,5 +11,7 @@ WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app ./
 
+ENV GOOGLE_APPLICATION_CREDENTIALS="/usr/src/app/gcloud.json"
+
 EXPOSE 3000
 CMD [ "npm", "run", "start:prod" ]
