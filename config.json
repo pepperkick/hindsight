@@ -1,17 +1,3 @@
 {
-  "mongodbUri": "mongodb://admin:8R9Q71JG5ZHMTIR9FI8YTV698US24LND@mongodb:27017/kaiend-dev",
-  "jwt": {
-    "secret": "QiXaLite-KaiEND#12223",
-    "expiry": "7d"
-  },
-  "discord": {
-    "clientId": "742993122128298056",
-    "clientSecret": "4TMhLzgP07nZSwZ3DFpYLyk43gARRgkJ",
-    "callbackUrl": "http://localhost:3000/accounts/login/discord/callback"
-  },
-  "steam": {
-    "returnUrl": "http://localhost:3000/accounts/login/steam/callback",
-    "realm": "http://localhost:3000/",
-    "apiKey": "016376737DA73C56A718E7D52F9ABADF"
-  }
+  "lighthouseMongodbUri": ""
 }

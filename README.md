@@ -4,12 +4,12 @@ Check resources usage across multiple platforms.
 
 ## Running
 
-### GCP
+### Configure
 
-- Copy key file to `./gcloud.json`
-- Set env variable before running the app
-```shell
-set GOOGLE_APPLICATION_CREDENTIALS=gcloud.json
+```json5
+{
+  "lighthouseMongodbUri": ""  // URL to lighthouse mongodb
+}
 ```
 
 ### Application

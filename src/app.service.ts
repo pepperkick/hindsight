@@ -1,25 +1,38 @@
 import { Injectable, Logger } from '@nestjs/common';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const Compute = require('@google-cloud/compute');
+import { GcloudWatcher } from './providers/watchers/gcloud.watcher';
+import { Model } from 'mongoose';
+import { Provider, ProviderType } from './providers/provider.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { ProviderService } from './providers/provider.service';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
 
+  constructor(
+    private readonly provider: ProviderService,
+    private readonly gcp: GcloudWatcher,
+  ) {}
+
   async start(): Promise<void> {
     this.logger.log('Starting...');
-    await this.checkGoogleCloud();
-  }
 
-  async checkGoogleCloud(): Promise<void> {
-    this.logger.log('Reading from GCP...');
+    // Read all providers from DB
+    const providers = await this.provider.fetchAll();
 
-    const compute = new Compute();
-    const [vms] = await compute.getVMs();
+    // Loop through each provider
+    for (const provider of providers) {
+      this.logger.debug(`Watching provider ${provider._id}...`);
 
-    for (const vm of vms) {
-      this.logger.log(`Instance Name: ${vm.id}`);
+      switch (provider.type) {
+        case ProviderType.GCloud:
+          await this.gcp.watch(provider);
+          break;
+        default:
+          this.logger.warn(
+            `Skipping ${provider._id} as provider type ${provider.type} is not supported`,
+          );
+      }
     }
   }
 }
