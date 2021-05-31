@@ -1,17 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GcloudWatcher } from './providers/watchers/gcloud.watcher';
-import { Model } from 'mongoose';
-import { Provider, ProviderType } from './providers/provider.model';
-import { InjectModel } from '@nestjs/mongoose';
+import { ProviderType } from './providers/provider.model';
 import { ProviderService } from './providers/provider.service';
+import { GcloudWatcher } from './watchers/gcloud.watcher';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
+  private gcloudWatched = false;
 
   constructor(
     private readonly provider: ProviderService,
-    private readonly gcp: GcloudWatcher,
+    private readonly gcloudWatcher: GcloudWatcher,
   ) {}
 
   async start(): Promise<void> {
@@ -26,7 +25,21 @@ export class AppService {
 
       switch (provider.type) {
         case ProviderType.GCloud:
-          await this.gcp.watch(provider);
+          // Skip watching the same provider again cause one service account returns all info
+          if (this.gcloudWatched) {
+            this.logger.log(
+              `Skipped ${provider._id} as Gcloud has been already watched.`,
+            );
+            continue;
+          }
+
+          try {
+            await this.gcloudWatcher.watch(provider);
+            this.gcloudWatched = true;
+          } catch (error) {
+            // TODO: Notify failure via discord webhook
+            this.logger.error(`Failed to read Gcloud resources`, error.stack);
+          }
           break;
         default:
           this.logger.warn(
