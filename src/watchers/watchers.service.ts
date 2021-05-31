@@ -2,7 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class WatchersService {
-  printOrphanReport(provider: string, type: string, id: string, name: string) {
+  printOrphanReport(
+    provider: string,
+    type: string,
+    id: string,
+    name: string | number,
+  ) {
     const logger = new Logger('OrphanResources');
 
     logger.error(`

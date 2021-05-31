@@ -10,7 +10,6 @@ const Compute = require('@google-cloud/compute');
 @Injectable()
 export class GcloudWatcher {
   private readonly logger = new Logger(GcloudWatcher.name);
-  provider: any;
   compute: any;
   config: any;
   project: string;
@@ -23,7 +22,6 @@ export class GcloudWatcher {
   async watch(provider: Provider): Promise<void> {
     this.logger.debug('Watching Gcloud resources...');
 
-    this.provider = provider;
     this.config = JSON.parse(provider.metadata.gcpConfig);
     this.project = this.config.project_id;
 
@@ -54,6 +52,8 @@ export class GcloudWatcher {
     for (const item of items) {
       this.logger.log(`Allocated ${type}, Name: ${item.id}`);
       const { id } = item;
+
+      // Example of id: tf2-60b4536ffc91d9001ad85b86
       const serverId = id.split('-')[1];
 
       // Check if the lighthouse server is open
