@@ -1,3 +1,4 @@
 {
-  "lighthouseMongodbUri": "mongodb://hindsight:7RWUQ5PQ4NPCW2J24HV35XU4RE4EJL3S@mongodb:27017/lighthouse-v1"
+  "lighthouseMongodbUri": "",
+  "discordWebhook": ""
 }

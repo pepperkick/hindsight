@@ -8,7 +8,8 @@ Check resources usage across multiple platforms.
 
 ```json5
 {
-  "lighthouseMongodbUri": ""  // URL to lighthouse mongodb
+  "lighthouseMongodbUri": "",  // URL to lighthouse mongodb
+  "discordWebhook": ""         // Discord webhook to notify orphan resources
 }
 ```
 

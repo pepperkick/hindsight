@@ -43,12 +43,12 @@ export class DigitalOceanWatcher {
       // Check if the lighthouse server is open
       // If the server is not open then resources are assumed to be orphaned
       if (!(await this.serversService.isOpenById(serverId))) {
-        // TODO: Notify orphan resource via discord webhook
-        this.watchersService.printOrphanReport(
+        await this.watchersService.printOrphanReport(
           'DigitalOcean',
           type,
-          serverId,
+          item.name,
           id,
+          serverId,
         );
       } else {
         this.logger.debug(

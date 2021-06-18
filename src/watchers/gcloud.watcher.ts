@@ -59,8 +59,13 @@ export class GcloudWatcher {
       // Check if the lighthouse server is open
       // If the server is not open then resources are assumed to be orphaned
       if (!(await this.serversService.isOpenById(serverId))) {
-        // TODO: Notify orphan resource via discord webhook
-        this.watchersService.printOrphanReport('Gcloud', type, serverId, id);
+        await this.watchersService.printOrphanReport(
+          'Gcloud',
+          type,
+          item.id,
+          id,
+          serverId,
+        );
       } else {
         this.logger.debug(
           `Resource ${item.id} (${type}) is allocated by ${serverId}`,
