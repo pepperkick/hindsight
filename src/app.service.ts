@@ -3,17 +3,20 @@ import { ProviderType } from './providers/provider.model';
 import { ProviderService } from './providers/provider.service';
 import { GcloudWatcher } from './watchers/gcloud.watcher';
 import { DigitalOceanWatcher } from './watchers/digitalocean.watcher';
+import { AzureWatcher } from './watchers/azure.watcher';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
   private gcloudWatched = false;
   private digitalOceanWatched = false;
+  private azureWatched = false;
 
   constructor(
     private readonly provider: ProviderService,
     private readonly gcloudWatcher: GcloudWatcher,
     private readonly digitalOceanWatcher: DigitalOceanWatcher,
+    private readonly azureWatcher: AzureWatcher,
   ) {}
 
   async start(): Promise<void> {
@@ -63,6 +66,23 @@ export class AppService {
               `Failed to read DigitalOcean resources`,
               error.stack,
             );
+          }
+          break;
+        case ProviderType.Azure:
+          // Skip watching the same provider again cause one service account returns all info
+          if (this.azureWatched) {
+            this.logger.log(
+              `Skipped ${provider._id} as Azure has been already watched.`,
+            );
+            continue;
+          }
+
+          try {
+            await this.azureWatcher.watch(provider);
+            this.azureWatched = true;
+          } catch (error) {
+            // TODO: Notify failure via discord webhook
+            this.logger.error(`Failed to read Azure resources`, error.stack);
           }
           break;
         default:
