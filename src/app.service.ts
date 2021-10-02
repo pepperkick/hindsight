@@ -4,6 +4,7 @@ import { ProviderService } from './providers/provider.service';
 import { GcloudWatcher } from './watchers/gcloud.watcher';
 import { DigitalOceanWatcher } from './watchers/digitalocean.watcher';
 import { AzureWatcher } from './watchers/azure.watcher';
+import { BinarylaneWatcher } from 'watchers/binarylane.watcher';
 
 @Injectable()
 export class AppService {
@@ -11,12 +12,14 @@ export class AppService {
   private gcloudWatched = false;
   private digitalOceanWatched = false;
   private azureWatched = false;
+  private binarylaneWatched = false;
 
   constructor(
     private readonly provider: ProviderService,
     private readonly gcloudWatcher: GcloudWatcher,
     private readonly digitalOceanWatcher: DigitalOceanWatcher,
     private readonly azureWatcher: AzureWatcher,
+    private readonly binarylaneWatcher: BinarylaneWatcher
   ) {}
 
   async start(): Promise<void> {
@@ -85,6 +88,25 @@ export class AppService {
             this.logger.error(`Failed to read Azure resources`, error.stack);
           }
           break;
+
+        case ProviderType.BinaryLane:
+          // Skip watching the same provider again cause one service account returns all info
+          if (this.binarylaneWatched){
+            this.logger.log(
+              `Skipped ${provider._id} as Binarylane has been already watched.`,
+            );
+            continue;
+          }
+
+          try{
+            await this.binarylaneWatcher.watch(provider);
+            this.binarylaneWatched = true;
+          }catch(error){
+            // TODO: Notify failure via discord webhook
+            this.logger.error(`Failed to read Binarylane resources`, error.stack);
+          }
+          break;
+
         default:
           this.logger.warn(
             `Skipping ${provider._id} as provider type ${provider.type} is not supported`,
