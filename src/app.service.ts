@@ -5,6 +5,7 @@ import { GcloudWatcher } from './watchers/gcloud.watcher';
 import { DigitalOceanWatcher } from './watchers/digitalocean.watcher';
 import { AzureWatcher } from './watchers/azure.watcher';
 import { BinarylaneWatcher } from 'watchers/binarylane.watcher';
+import { LinodeWatcher } from 'watchers/linode.watcher';
 
 @Injectable()
 export class AppService {
@@ -13,13 +14,15 @@ export class AppService {
   private digitalOceanWatched = false;
   private azureWatched = false;
   private binarylaneWatched = false;
+  private linodeWatched = false;
 
   constructor(
     private readonly provider: ProviderService,
     private readonly gcloudWatcher: GcloudWatcher,
     private readonly digitalOceanWatcher: DigitalOceanWatcher,
     private readonly azureWatcher: AzureWatcher,
-    private readonly binarylaneWatcher: BinarylaneWatcher
+    private readonly binarylaneWatcher: BinarylaneWatcher,
+    private readonly linodeWatcher: LinodeWatcher
   ) {}
 
   async start(): Promise<void> {
@@ -106,6 +109,24 @@ export class AppService {
             this.logger.error(`Failed to read Binarylane resources`, error.stack);
           }
           break;
+
+          case ProviderType.Linode:
+            // Skip watching the same provider again cause one service account returns all info
+            if(this.linodeWatched){
+              this.logger.log(
+                `Skipped ${provider._id} as Linode has been already watched.`,
+              );
+              continue;
+            }
+
+            try{
+              await this.linodeWatcher.watch(provider);
+              this.linodeWatched = true;
+            }catch(error){
+              // TODO: Notify failure via discord webhook
+              this.logger.error(`Failed to read Linode resources`, error.stack);
+            }
+            break;
 
         default:
           this.logger.warn(
