@@ -26,13 +26,13 @@ export class GcloudWatcher {
     this.project = this.config.project_id;
 
     writeFileSync(
-      `./gcloud-${provider.id}-${this.project}.key.json`,
+      `./gcloud-${provider._id}-${this.project}.key.json`,
       JSON.stringify(this.config),
     );
 
     this.compute = new Compute({
       projectId: this.project,
-      keyFilename: `./gcloud-${provider.id}-${this.project}.key.json`,
+      keyFilename: `./gcloud-${provider._id}-${this.project}.key.json`,
     });
     this.compute.zone(provider.metadata.gcpZone);
     this.compute.region(provider.metadata.gcpRegion);
