@@ -22,7 +22,7 @@ export class AppService {
     private readonly digitalOceanWatcher: DigitalOceanWatcher,
     private readonly azureWatcher: AzureWatcher,
     private readonly binarylaneWatcher: BinarylaneWatcher,
-    private readonly linodeWatcher: LinodeWatcher
+    private readonly linodeWatcher: LinodeWatcher,
   ) {}
 
   async start(): Promise<void> {
@@ -94,39 +94,42 @@ export class AppService {
 
         case ProviderType.BinaryLane:
           // Skip watching the same provider again cause one service account returns all info
-          if (this.binarylaneWatched){
+          if (this.binarylaneWatched) {
             this.logger.log(
               `Skipped ${provider._id} as Binarylane has been already watched.`,
             );
             continue;
           }
 
-          try{
+          try {
             await this.binarylaneWatcher.watch(provider);
             this.binarylaneWatched = true;
-          }catch(error){
+          } catch (error) {
             // TODO: Notify failure via discord webhook
-            this.logger.error(`Failed to read Binarylane resources`, error.stack);
+            this.logger.error(
+              `Failed to read Binarylane resources`,
+              error.stack,
+            );
           }
           break;
 
-          case ProviderType.Linode:
-            // Skip watching the same provider again cause one service account returns all info
-            if(this.linodeWatched){
-              this.logger.log(
-                `Skipped ${provider._id} as Linode has been already watched.`,
-              );
-              continue;
-            }
+        case ProviderType.Linode:
+          // Skip watching the same provider again cause one service account returns all info
+          if (this.linodeWatched) {
+            this.logger.log(
+              `Skipped ${provider._id} as Linode has been already watched.`,
+            );
+            continue;
+          }
 
-            try{
-              await this.linodeWatcher.watch(provider);
-              this.linodeWatched = true;
-            }catch(error){
-              // TODO: Notify failure via discord webhook
-              this.logger.error(`Failed to read Linode resources`, error.stack);
-            }
-            break;
+          try {
+            await this.linodeWatcher.watch(provider);
+            this.linodeWatched = true;
+          } catch (error) {
+            // TODO: Notify failure via discord webhook
+            this.logger.error(`Failed to read Linode resources`, error.stack);
+          }
+          break;
 
         default:
           this.logger.warn(
