@@ -3,6 +3,7 @@ import { ServersService } from '../servers/servers.service';
 import { WatchersService } from './watchers.service';
 import { Provider } from '../providers/provider.model';
 import Linodev4 from 'linode-v4';
+import * as config from '../../config.json';
 
 @Injectable()
 export class LinodeWatcher {
@@ -31,9 +32,11 @@ export class LinodeWatcher {
       this.logger.log(`Allocated ${type}, Name: ${item.tags[1]} (${item.id})`);
       const { id, tags } = item;
 
-      // Example of name: lighthouse-60b4536ffc91d9001ad85b86
-      const serverId = tags[1].split('-')[1];
-      // TODO: Check if first part is lighthouse
+      // Example of tag: qixalite-60b4536ffc91d9001ad85b86
+      const [label, serverId] = tags[1].split('-')[1];
+      if (label !== config.label) {
+        return;
+      }
 
       // Check if the lighthouse server is open
       // If the server is not open then resources are assumed to be orphaned

@@ -4,6 +4,7 @@ import { ServersService } from 'servers/servers.service';
 import { Provider } from 'providers/provider.model';
 import { WatchersService } from './watchers.service';
 import { IDroplet } from 'dots-wrapper/dist/modules/droplet';
+import * as config from '../../config.json';
 
 @Injectable()
 export class DigitalOceanWatcher {
@@ -36,9 +37,11 @@ export class DigitalOceanWatcher {
       this.logger.log(`Allocated ${type}, Name: ${item.name} (${item.id})`);
       const { id, name } = item;
 
-      // Example of name: lighthouse-60b4536ffc91d9001ad85b86
-      const serverId = name.split('-')[1];
-      // TODO: Check if first part is lighthouse
+      // Example of name: qixalite-60b4536ffc91d9001ad85b86
+      const [label, serverId] = name.split('-');
+      if (label !== config.label) {
+        return;
+      }
 
       // Check if the lighthouse server is open
       // If the server is not open then resources are assumed to be orphaned

@@ -1,4 +1,5 @@
 {
   "lighthouseMongodbUri": "",
-  "discordWebhook": ""
+  "discordWebhook": "",
+  "label": ""
 }

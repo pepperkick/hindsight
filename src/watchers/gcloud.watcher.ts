@@ -3,6 +3,7 @@ import { writeFileSync } from 'fs';
 import { Provider } from 'providers/provider.model';
 import { ServersService } from 'servers/servers.service';
 import { WatchersService } from './watchers.service';
+import * as config from '../../config.json';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Compute = require('@google-cloud/compute');
@@ -53,8 +54,11 @@ export class GcloudWatcher {
       this.logger.log(`Allocated ${type}, Name: ${item.id}`);
       const { id } = item;
 
-      // Example of id: tf2-60b4536ffc91d9001ad85b86
-      const serverId = id.split('-')[1];
+      // Example of id: qixalite-60b4536ffc91d9001ad85b86
+      const [label, serverId] = id.split('-');
+      if (label !== config.label) {
+        return;
+      }
 
       // Check if the lighthouse server is open
       // If the server is not open then resources are assumed to be orphaned
