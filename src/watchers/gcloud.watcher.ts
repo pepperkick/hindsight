@@ -14,6 +14,12 @@ export class GcloudWatcher {
   compute: any;
   config: any;
   project: string;
+  resourceMap: {
+    [key: string]: {
+      ip: any;
+      vm: any;
+    };
+  } = {};
 
   constructor(
     private readonly serversService: ServersService,
@@ -63,13 +69,18 @@ export class GcloudWatcher {
       // Check if the lighthouse server is open
       // If the server is not open then resources are assumed to be orphaned
       if (!(await this.serversService.isOpenById(serverId))) {
-        await this.watchersService.printOrphanReport(
-          'Gcloud',
-          type,
-          item.id,
-          id,
-          serverId,
-        );
+        try {
+          await this.removeResource(type, id, serverId, item);
+        } catch (error) {
+          this.logger.error(error);
+          await this.watchersService.printOrphanReport(
+            'Gcloud',
+            type,
+            item.id,
+            id,
+            serverId,
+          );
+        }
       } else {
         this.logger.debug(
           `Resource ${item.id} (${type}) is allocated by ${serverId}`,
@@ -77,6 +88,69 @@ export class GcloudWatcher {
       }
 
       // TODO: Check for how long the resources are allocated for
+    }
+  }
+
+  async removeResource(type: string, id: string, serverId: string, item: any) {
+    this.logger.debug(`Removing Gcloud ${type} resource...`);
+
+    if (!this.resourceMap[id])
+      this.resourceMap[id] = {
+        ip: undefined,
+        vm: undefined,
+      };
+
+    if (type === 'External IPs') {
+      this.resourceMap[id].ip = item;
+    } else if (type === 'Virtual Machines') {
+      this.resourceMap[id].vm = item;
+    }
+
+    if (this.resourceMap[id].ip && this.resourceMap[id].vm) {
+      const vm = this.resourceMap[id].vm;
+      const ip = this.resourceMap[id].ip;
+
+      try {
+        // Delete the vm
+        this.logger.debug(`Removing VM...`);
+        await vm.delete();
+        this.logger.debug(`Waiting for VM to remove...`);
+        await vm.waitFor('TERMINATED', {
+          timeout: 600,
+        });
+
+        // Delete the ip
+        this.logger.debug(`Removing IP...`);
+        await ip.delete();
+
+        await this.watchersService.printDeletionReport(
+          'Gcloud',
+          'Virtual Machines',
+          item.id,
+          id,
+          serverId,
+        );
+      } catch (error) {
+        throw new Error('Failed to delete resources');
+      }
+    } else if (this.resourceMap[id].ip) {
+      const ip = this.resourceMap[id].ip;
+
+      try {
+        // Delete the ip
+        this.logger.debug(`Removing IP...`);
+        await ip.delete();
+
+        await this.watchersService.printDeletionReport(
+          'Gcloud',
+          'External IPs',
+          item.id,
+          id,
+          serverId,
+        );
+      } catch (error) {
+        throw new Error('Failed to delete resources');
+      }
     }
   }
 }

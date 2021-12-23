@@ -23,6 +23,8 @@ export class WatchersService {
     =======================================
     `);
 
+    if (!config.discordWebhook) return;
+
     const hook = new Webhook(config.discordWebhook);
     hook.setUsername('Hindsight');
     const embed = new MessageBuilder()
@@ -34,6 +36,44 @@ export class WatchersService {
       .addField('Resource Type', type, true)
       .addField('Provider', provider, true)
       .setColor(16711680)
+      .setTimestamp();
+
+    await hook.send(embed);
+    logger.debug(`Sent discord webhook`);
+  }
+
+  async printDeletionReport(
+    provider: string,
+    type: string,
+    name: string,
+    id: string | number,
+    lid: string | number,
+  ) {
+    const logger = new Logger('DeletedResources');
+
+    logger.log(`
+    =========== DELETED RESOURCE ===========
+    PROVIDER: ${provider}
+    TYPE:     ${type}
+    NAME:     ${name}
+    ID:       ${id}
+    LID:      ${lid}
+    =======================================
+    `);
+
+    if (!config.discordWebhook) return;
+
+    const hook = new Webhook(config.discordWebhook);
+    hook.setUsername('Hindsight');
+    const embed = new MessageBuilder()
+      .setTitle('Deleted Resource')
+      .setAuthor('Hindsight')
+      .addField('Resource ID', `${id}`, true)
+      .addField('Resource Name', `${name}`, true)
+      .addField('Lighthouse ID', `${lid}`, true)
+      .addField('Resource Type', type, true)
+      .addField('Provider', provider, true)
+      .setColor(0x4caf50)
       .setTimestamp();
 
     await hook.send(embed);
