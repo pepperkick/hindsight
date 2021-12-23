@@ -35,7 +35,7 @@ export class LinodeWatcher {
       // Example of tag: qixalite-60b4536ffc91d9001ad85b86
       const [label, serverId] = tags[1].split('-')[1];
       if (label !== config.label) {
-        return;
+        continue;
       }
 
       // Check if the lighthouse server is open

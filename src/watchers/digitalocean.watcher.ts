@@ -40,7 +40,7 @@ export class DigitalOceanWatcher {
       // Example of name: qixalite-60b4536ffc91d9001ad85b86
       const [label, serverId] = name.split('-');
       if (label !== config.label) {
-        return;
+        continue;
       }
 
       // Check if the lighthouse server is open

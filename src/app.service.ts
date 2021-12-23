@@ -6,10 +6,12 @@ import { DigitalOceanWatcher } from './watchers/digitalocean.watcher';
 import { AzureWatcher } from './watchers/azure.watcher';
 import { BinarylaneWatcher } from 'watchers/binarylane.watcher';
 import { LinodeWatcher } from 'watchers/linode.watcher';
+import { KubernetesWatcher } from './watchers/kubernetes.watcher';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
+  private kubeWatched = false;
   private gcloudWatched = false;
   private digitalOceanWatched = false;
   private azureWatched = false;
@@ -17,6 +19,7 @@ export class AppService {
   private linodeWatched = false;
 
   constructor(
+    private readonly kubernetesWatcher: KubernetesWatcher,
     private readonly provider: ProviderService,
     private readonly gcloudWatcher: GcloudWatcher,
     private readonly digitalOceanWatcher: DigitalOceanWatcher,
@@ -37,6 +40,25 @@ export class AppService {
 
       // TODO: Support multiple accounts
       switch (provider.type) {
+        case ProviderType.KubernetesNode:
+          if (this.kubeWatched) {
+            this.logger.log(
+              `Skipped ${provider._id} as Kubernetes has been already watched.`,
+            );
+            continue;
+          }
+
+          try {
+            await this.kubernetesWatcher.watch(provider);
+            this.kubeWatched = true;
+          } catch (error) {
+            // TODO: Notify failure via discord webhook
+            this.logger.error(
+              `Failed to read Kubernetes resources`,
+              error.stack,
+            );
+          }
+          break;
         case ProviderType.GCloud:
           // Skip watching the same provider again cause one service account returns all info
           if (this.gcloudWatched) {

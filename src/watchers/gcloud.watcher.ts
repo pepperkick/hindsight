@@ -63,7 +63,7 @@ export class GcloudWatcher {
       // Example of id: qixalite-60b4536ffc91d9001ad85b86
       const [label, serverId] = id.split('-');
       if (label !== config.label) {
-        return;
+        continue;
       }
 
       // Check if the lighthouse server is open
@@ -110,47 +110,39 @@ export class GcloudWatcher {
       const vm = this.resourceMap[id].vm;
       const ip = this.resourceMap[id].ip;
 
-      try {
-        // Delete the vm
-        this.logger.debug(`Removing VM...`);
-        await vm.delete();
-        this.logger.debug(`Waiting for VM to remove...`);
-        await vm.waitFor('TERMINATED', {
-          timeout: 600,
-        });
+      // Delete the vm
+      this.logger.debug(`Removing VM...`);
+      await vm.delete();
+      this.logger.debug(`Waiting for VM to remove...`);
+      await vm.waitFor('TERMINATED', {
+        timeout: 600,
+      });
 
-        // Delete the ip
-        this.logger.debug(`Removing IP...`);
-        await ip.delete();
+      // Delete the ip
+      this.logger.debug(`Removing IP...`);
+      await ip.delete();
 
-        await this.watchersService.printDeletionReport(
-          'Gcloud',
-          'Virtual Machines',
-          item.id,
-          id,
-          serverId,
-        );
-      } catch (error) {
-        throw new Error('Failed to delete resources');
-      }
+      await this.watchersService.printDeletionReport(
+        'Gcloud',
+        'Virtual Machines',
+        item.id,
+        id,
+        serverId,
+      );
     } else if (this.resourceMap[id].ip) {
       const ip = this.resourceMap[id].ip;
 
-      try {
-        // Delete the ip
-        this.logger.debug(`Removing IP...`);
-        await ip.delete();
+      // Delete the ip
+      this.logger.debug(`Removing IP...`);
+      await ip.delete();
 
-        await this.watchersService.printDeletionReport(
-          'Gcloud',
-          'External IPs',
-          item.id,
-          id,
-          serverId,
-        );
-      } catch (error) {
-        throw new Error('Failed to delete resources');
-      }
+      await this.watchersService.printDeletionReport(
+        'Gcloud',
+        'External IPs',
+        item.id,
+        id,
+        serverId,
+      );
     }
   }
 }

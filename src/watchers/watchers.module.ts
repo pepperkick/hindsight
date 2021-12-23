@@ -6,6 +6,7 @@ import { DigitalOceanWatcher } from './digitalocean.watcher';
 import { AzureWatcher } from './azure.watcher';
 import { BinarylaneWatcher } from './binarylane.watcher';
 import { LinodeWatcher } from './linode.watcher';
+import { KubernetesWatcher } from './kubernetes.watcher';
 
 @Module({
   imports: [ServersModule],
@@ -16,6 +17,7 @@ import { LinodeWatcher } from './linode.watcher';
     AzureWatcher,
     BinarylaneWatcher,
     LinodeWatcher,
+    KubernetesWatcher,
   ],
   exports: [
     GcloudWatcher,
@@ -23,6 +25,7 @@ import { LinodeWatcher } from './linode.watcher';
     AzureWatcher,
     BinarylaneWatcher,
     LinodeWatcher,
+    KubernetesWatcher,
   ],
 })
 export class WatchersModule {}

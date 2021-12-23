@@ -48,7 +48,7 @@ export class AzureWatcher {
       // Example of name: qixalite-60b4536ffc91d9001ad85b86
       const [label, serverId] = name.split('-')[1];
       if (label !== config.label) {
-        return;
+        continue;
       }
 
       // Check if the lighthouse server is open
