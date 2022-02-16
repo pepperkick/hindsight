@@ -33,7 +33,7 @@ export class LinodeWatcher {
       const { id, tags } = item;
 
       // Example of tag: qixalite-60b4536ffc91d9001ad85b86
-      const [label, serverId] = tags[1].split('-')[1];
+      const [label, serverId] = tags[2].split('-')[1];
       if (label !== config.label) {
         continue;
       }
@@ -44,7 +44,7 @@ export class LinodeWatcher {
         await this.watchersService.printOrphanReport(
           'Linode',
           type,
-          item.tags[1],
+          item.tags[2],
           id,
           serverId,
         );

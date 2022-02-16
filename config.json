@@ -1,5 +1,6 @@
 {
   "lighthouseMongodbUri": "",
   "discordWebhook": "",
-  "label": ""
+  "label": "",
+  "longRunningLimit": ""
 }

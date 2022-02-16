@@ -22,4 +22,18 @@ export class ServersService {
   isOpen(server: Server): boolean {
     return ![ServerStatus.FAILED, ServerStatus.CLOSED].includes(server.status);
   }
+
+  async getAllRunning(): Promise<Array<Server>> {
+    const servers = await this.repository.find();
+    const running = [];
+    for (const server of servers) {
+      if (this.isRunning(server)) running.push(server);
+      else continue;
+    }
+    return running;
+  }
+
+  isRunning(server: Server): boolean {
+    return [ServerStatus.RUNNING].includes(server.status);
+  }
 }
