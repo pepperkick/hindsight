@@ -10,8 +10,11 @@ Check resources usage across multiple platforms.
 {
   "lighthouseMongodbUri": "",  // URL to lighthouse mongodb
   "discordWebhook": "",        // Discord webhook to notify orphan resources
-  "label": "",                 // Label in tags for lighthouse-v2
-  "longRunningLimit": ""       // Time in minutes that defines a long running resource
+  "label": "",                 // Label in tags for lighthouse-v2  
+  "monitorLongRunningInstances": {
+    "enabled": false,          // Enable long-running instances monitoring
+    "threshold": 240           // Time in minutes to consider a long-running instance
+  }
 }
 ```
 

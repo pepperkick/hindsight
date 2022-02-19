@@ -14,7 +14,7 @@ export class LongRunningWatcher {
   ) {}
 
   async watch(): Promise<void> {
-    if (config.monitorLongRunningInstances.enabled) return;
+    if (!config.monitorLongRunningInstances.enabled) return;
 
     this.logger.debug('Monitoring Long Running resources...');
 
