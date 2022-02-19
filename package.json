@@ -32,6 +32,7 @@
     "dots-wrapper": "^3.5.6",
     "kubernetes-client": "^9.0.0",
     "linode-v4": "^2.1.8",
+    "moment": "^2.29.1",
     "mongoose": "^5.12.12",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

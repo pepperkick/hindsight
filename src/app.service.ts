@@ -7,6 +7,7 @@ import { AzureWatcher } from './watchers/azure.watcher';
 import { BinarylaneWatcher } from 'watchers/binarylane.watcher';
 import { LinodeWatcher } from 'watchers/linode.watcher';
 import { KubernetesWatcher } from './watchers/kubernetes.watcher';
+import { LongRunningWatcher } from './watchers/longrunning.watcher';
 
 @Injectable()
 export class AppService {
@@ -26,6 +27,7 @@ export class AppService {
     private readonly azureWatcher: AzureWatcher,
     private readonly binarylaneWatcher: BinarylaneWatcher,
     private readonly linodeWatcher: LinodeWatcher,
+    private readonly longRunningWatcher: LongRunningWatcher,
   ) {}
 
   async start(): Promise<void> {
@@ -158,6 +160,17 @@ export class AppService {
             `Skipping ${provider._id} as provider type ${provider.type} is not supported`,
           );
       }
+    }
+
+    // Long running check from all RUNNING instance of lighthouse server
+    try {
+      await this.longRunningWatcher.watch();
+    } catch (error) {
+      // TODO: Notify failure via discord webhook
+      this.logger.error(
+        `Failed to execute Long Running monitoring process`,
+        error.stack,
+      );
     }
   }
 }

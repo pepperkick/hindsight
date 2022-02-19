@@ -1,5 +1,9 @@
 {
   "lighthouseMongodbUri": "",
   "discordWebhook": "",
-  "label": ""
+  "label": "",
+  "monitorLongRunningInstances": {
+    "enabled": false,
+    "threshold": 240
+  }
 }
