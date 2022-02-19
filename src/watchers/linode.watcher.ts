@@ -33,7 +33,8 @@ export class LinodeWatcher {
       const { id, tags } = item;
 
       // Example of tag: qixalite-60b4536ffc91d9001ad85b86
-      const [label, serverId] = tags[2].split('-')[1];
+      const tag = tags.find((t) => t.startsWith(`${config.label}-`));
+      const [label, serverId] = tag.split('-');
       if (label !== config.label) {
         continue;
       }
@@ -53,8 +54,6 @@ export class LinodeWatcher {
           `Resource ${item.id} (${type}) is allocated by ${serverId}`,
         );
       }
-
-      // TODO: Check for how long the resources are allocated for
     }
   }
 }

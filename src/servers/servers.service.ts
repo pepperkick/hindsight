@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Server } from './server.model';
 import { Model } from 'mongoose';
 import { ServerStatus } from '../objects/server-status.enum';
+import * as moment from 'moment';
 
 @Injectable()
 export class ServersService {
@@ -23,17 +24,21 @@ export class ServersService {
     return ![ServerStatus.FAILED, ServerStatus.CLOSED].includes(server.status);
   }
 
-  async getAllRunning(): Promise<Array<Server>> {
-    const servers = await this.repository.find();
-    const running = [];
-    for (const server of servers) {
-      if (this.isRunning(server)) running.push(server);
-      else continue;
-    }
-    return running;
+  /**
+   * Return servers that are open more than threshold
+   *
+   * @param threshold Minutes
+   */
+  async getLongRunningServers(threshold: number): Promise<Server[]> {
+    const runningServers = await this.getAllRunning();
+    return runningServers.filter((server) =>
+      moment(server.createdAt).add(threshold, 'minutes').isBefore(),
+    );
   }
 
-  isRunning(server: Server): boolean {
-    return [ServerStatus.RUNNING].includes(server.status);
+  async getAllRunning(): Promise<Server[]> {
+    return this.repository.find({
+      status: ServerStatus.RUNNING,
+    });
   }
 }

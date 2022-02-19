@@ -86,8 +86,6 @@ export class GcloudWatcher {
           `Resource ${item.id} (${type}) is allocated by ${serverId}`,
         );
       }
-
-      // TODO: Check for how long the resources are allocated for
     }
   }
 

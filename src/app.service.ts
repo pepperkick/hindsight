@@ -18,7 +18,6 @@ export class AppService {
   private azureWatched = false;
   private binarylaneWatched = false;
   private linodeWatched = false;
-  private longRunningWatched = false;
 
   constructor(
     private readonly kubernetesWatcher: KubernetesWatcher,
@@ -164,19 +163,14 @@ export class AppService {
     }
 
     // Long running check from all RUNNING instance of lighthouse server
-    if (this.longRunningWatched) {
-      this.logger.log(`Skipped as process has been already started.`);
-    } else {
-      try {
-        await this.longRunningWatcher.watch();
-        this.longRunningWatched = true;
-      } catch (error) {
-        // TODO: Notify failure via discord webhook
-        this.logger.error(
-          `Failed to execute Long Running monitoring process`,
-          error.stack,
-        );
-      }
+    try {
+      await this.longRunningWatcher.watch();
+    } catch (error) {
+      // TODO: Notify failure via discord webhook
+      this.logger.error(
+        `Failed to execute Long Running monitoring process`,
+        error.stack,
+      );
     }
   }
 }
